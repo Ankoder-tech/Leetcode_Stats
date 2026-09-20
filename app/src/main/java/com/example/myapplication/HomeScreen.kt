@@ -37,7 +37,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 
 @Composable
-fun HomeScreen(backtohome: () -> Unit) {
+fun HomeScreen(backtologin: () -> Unit, gotosubmissions: () -> Unit) {
     val backgroundColor = Color(0xFF1A1A1A)
     val cardColor = Color(0xFF262626)
     Column(
@@ -48,7 +48,7 @@ fun HomeScreen(backtohome: () -> Unit) {
             .padding(16.dp)
     ) {
         Spacer(modifier = Modifier.height(20.dp))
-        IconButton(onClick = { backtohome() }
+        IconButton(onClick = { backtologin() }
         ) {
             Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Back",
@@ -209,44 +209,48 @@ fun HomeScreen(backtohome: () -> Unit) {
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = cardColor
-                ),
-                shape = RoundedCornerShape(12.dp)
+        Card(
+            modifier = Modifier.fillMaxWidth()
+                .clickable{ gotosubmissions()},
+
+
+
+            colors = CardDefaults.cardColors(
+                containerColor = cardColor
+            ),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+
+            Column(
+                modifier = Modifier.padding(16.dp)
             ) {
 
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
+                Text(
+                    text = "Recent Submissions",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
 
-                    Text(
-                        text = "Recent Submissions",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
+                Spacer(modifier = Modifier.height(12.dp))
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = "Min Cost to Connect All Points",
+                    fontSize = 16.sp,
+                    color = Color.White
+                )
 
-                    Text(
-                        text = "Min Cost to Connect All Points",
-                        fontSize = 16.sp,
-                        color = Color.White
-                    )
+                Spacer(modifier = Modifier.height(6.dp))
 
-                    Spacer(modifier = Modifier.height(6.dp))
-
-                    Text(
-                        text = "Accepted  •  9 months ago",
-                        fontSize = 14.sp,
-                        color = Orange
-                    )
-                }
+                Text(
+                    text = "Accepted  •  9 months ago",
+                    fontSize = 14.sp,
+                    color = Orange
+                )
             }
+        }
 
-            Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
 
 

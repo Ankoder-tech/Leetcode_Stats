@@ -186,14 +186,14 @@ fun LoginScreen(onloginSuccess: () -> Unit) {
 
 
 private fun authenticate(username: String, password: String): Boolean {
-    val validUsername = "a"
-    val validPassword = "p"
+    val validUsername = "adimin"
+    val validPassword = "password"
     return username == validUsername && password == validPassword
 }
 @Composable
 fun Nav(){
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "home"
+    NavHost(navController = navController, startDestination = "login"
     ) {
         composable("login"){
                 LoginScreen(onloginSuccess = {
@@ -202,18 +202,22 @@ fun Nav(){
 
 
         }
-        composable("home") {
-            HomeScreen(backtohome = {
-                navController.navigate("login")
-            })
+        composable(route = "home") {
+            HomeScreen(
+                backtologin = {
+                    navController.navigate("Login")
+                },
+                gotosubmissions = {
+                    navController.navigate("submissions")
+                }
+            )
         }
-        composable ( "home" ){
-            HomeScreen(backtohome = {
-                navController.navigate("submission")
-            })
-        }
-        composable ( "submission"){
-                SubmissionScreen()
+        composable(route = "submissions") {
+            SubmissionScreen(
+                backtohome = {
+                    navController.popBackStack()
+                }
+            )
         }
 
 
