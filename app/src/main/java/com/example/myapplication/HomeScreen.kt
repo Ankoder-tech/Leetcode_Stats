@@ -4,6 +4,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
@@ -45,7 +49,7 @@ fun HomeScreen() {
         Text(text = "My LeetCode Stats", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.White)
         Spacer(modifier = Modifier.height(16.dp))
 
-        Card(
+        Card(elevation= CardDefaults.cardElevation(defaultElevation = 10.dp),
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = cardColor),
             shape = RoundedCornerShape(12.dp)
@@ -75,7 +79,7 @@ fun HomeScreen() {
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
-        Card(
+        Card(elevation= CardDefaults.cardElevation(defaultElevation = 10.dp),
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(
                 containerColor = cardColor
@@ -83,8 +87,7 @@ fun HomeScreen() {
             shape = RoundedCornerShape(12.dp)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text(text = "Problems Solved",
-                    fontSize = 20.sp,
+                Text(text = "Problems Solved", fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
                 )
@@ -109,11 +112,93 @@ fun HomeScreen() {
                 )
             }
         }
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(text = "Problem Difficulty",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        Row(modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+
+            DifficultyCard(
+                title = "Easy",
+                solved = "12",
+                total = "966",
+                color = Color(0xFF00B8A3),
+                modifier = Modifier.weight(1f)
+            )
+
+            DifficultyCard(
+                title = "Medium",
+                solved = "42",
+                total = "2117",
+                color = Color(0xFFFFC01E),
+                modifier = Modifier.weight(1f)
+            )
+
+            DifficultyCard(
+                title = "Hard",
+                solved = "14",
+                total = "976",
+                color = Color(0xFFFF375F),
+                modifier = Modifier.weight(1f)
+            )
+        }
 
 
 
     }
 }
 
+@Composable
+fun DifficultyCard(
+    title: String,
+    solved: String,
+    total: String,
+    color: Color,
+    modifier: Modifier = Modifier
+) {
+
+    Card(modifier = modifier.clickable{},
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFF262626)
+        ),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Row(modifier = Modifier.padding(12.dp),verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween) {
+
+            Spacer(modifier = Modifier.width(12.dp))
+            Column(modifier = Modifier.weight(1f)
+            ) {
+                Text(text = title,
+                    color = color,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(text = "$solved / $total",
+                    color = Color.White,
+                    fontSize = 13.sp
+                )
+            }
+            DifficultyCircle(color)
+
+        }
+    }
+}
+@Composable
+fun DifficultyCircle(color: Color) {
+    Box(modifier = Modifier.size(15.dp)
+            .background(
+                color = color,
+                shape = CircleShape
+            )
+    )
+}
 
 
