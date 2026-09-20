@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -26,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.Alignment
+import com.example.myapplication.ui.theme.Orange
 
 @Composable
 fun HomeScreen() {
@@ -70,6 +72,41 @@ fun HomeScreen() {
                         fontSize = 14.sp
                     )
                 }
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = cardColor
+            ),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(text = "Problems Solved",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Text(text = "100 / 4059", fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Orange
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                LinearProgressIndicator(progress ={ 100f / 4059f}, modifier = Modifier
+                        .fillMaxWidth()
+                        .height(12.dp),
+                    color = Orange,
+                    trackColor = Color.DarkGray
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(text = "3 Attempting",
+                    color = Color.LightGray,
+                    fontSize = 14.sp
+                )
             }
         }
 
