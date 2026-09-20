@@ -193,7 +193,7 @@ private fun authenticate(username: String, password: String): Boolean {
 @Composable
 fun Nav(){
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "home"
+    NavHost(navController = navController, startDestination = "submission"
     ) {
         composable("login"){
                 LoginScreen(onloginSuccess = {
@@ -207,6 +207,16 @@ fun Nav(){
                 navController.navigate("login")
             })
         }
+        composable ( "home" ){
+            HomeScreen(backtohome = {
+                navController.navigate("submission")
+            })
+        }
+        composable ( "submission"){
+                SubmissionScreen()
+        }
+
+
     }
 
 
