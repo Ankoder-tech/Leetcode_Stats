@@ -205,7 +205,7 @@ fun LoginScreen(onloginSuccess: () -> Unit) {
 
 
 private fun authenticate(username: String, password: String): Boolean {
-    val validUsername = "admin"
-    val validPassword = "password"
+    val validUsername = "a"
+    val validPassword = "p"
     return username == validUsername && password == validPassword
 }
