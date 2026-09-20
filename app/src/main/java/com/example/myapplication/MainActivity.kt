@@ -40,28 +40,9 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MyApplicationTheme {
+                Nav()
 
-                val navController = rememberNavController()
-                NavHost(
-                    navController = navController,
-                    startDestination = "login"
-                ) {
-                    composable("login") {
 
-                        LoginScreen(
-                            onloginSuccess = {
-                                navController.navigate("home") {
-                                    popUpTo("login") {
-                                        inclusive = true
-                                    }
-                                }
-                            }
-                        )
-                    }
-                    composable("home") {
-                        HomeScreen()
-                    }
-                }
             }
         }
     }
@@ -208,4 +189,25 @@ private fun authenticate(username: String, password: String): Boolean {
     val validUsername = "a"
     val validPassword = "p"
     return username == validUsername && password == validPassword
+}
+@Composable
+fun Nav(){
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = "home"
+    ) {
+        composable("login"){
+                LoginScreen(onloginSuccess = {
+                    navController.navigate("home")
+                })
+
+
+        }
+        composable("home") {
+            HomeScreen(backtohome = {
+                navController.navigate("login")
+            })
+        }
+    }
+
+
 }
