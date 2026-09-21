@@ -29,7 +29,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.example.myapplication.ui.theme.Orange
 
-val Green = Color(0xFF2DA44E)
 val LightGray = Color(0xFFF7F9F8)
 val DarkText = Color(0xFF202124)
 
