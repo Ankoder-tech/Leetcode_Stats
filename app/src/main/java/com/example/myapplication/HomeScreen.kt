@@ -34,12 +34,8 @@ import com.google.gson.JsonArray
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.text.style.TextAlign
-
 @Composable
-fun HomeScreen(username: String,
-    backtologin: () -> Unit,
-    gotosubmissions: () -> Unit
-) {
+fun HomeScreen(username: String, backtologin: () -> Unit, gotosubmissions: () -> Unit) {
     val backgroundColor = Color(0xFF1A1A1A)
     val cardColor = Color(0xFF262626)
     val repository = remember { LeetCodeRepository() }
@@ -66,6 +62,7 @@ fun HomeScreen(username: String,
     Column(modifier = Modifier
             .fillMaxSize()
             .background(backgroundColor)
+             .safeDrawingPadding()
             .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
@@ -346,29 +343,6 @@ fun HomeScreen(username: String,
                             }
                         }
                     }
-                }
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Card(modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = cardColor
-                ),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)
-                ) {
-                    Text(text = "Activity Stats",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Text(text = "Activity details are not loaded yet.",
-                        color = Color.LightGray,
-                        fontSize = 14.sp
-                    )
                 }
             }
 

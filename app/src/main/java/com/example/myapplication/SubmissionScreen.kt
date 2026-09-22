@@ -7,16 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,32 +15,34 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
+import kotlinx.coroutines.withTimeout
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-
-import com.google.gson.JsonElement
-val backgroundColor = Color(0xFF1A1A1A)
-val submissionCardColor = Color(0xFF262626)
+private val backgroundColor = Color(0xFF1A1A1A)
+private val submissionCardColor = Color(0xFF262626)
+private val acceptedColor = Color(0xFF00B8A3)
+private val accentColor = Color(0xFFFFA116)
 data class Submission(
+    val id: String,
     val date: String,
     val problemName: String,
     val result: String,
     val language: String
 )
 @Composable
-fun SubmissionCard(submission: Submission,
+fun SubmissionCard(
+    submission: Submission,
     modifier: Modifier = Modifier
 ) {
-
-    Card(modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-
-        colors = CardDefaults.cardColors(
-            containerColor = submissionCardColor
-        ),
-        shape = RoundedCornerShape(8.dp)
+    Card(modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = submissionCardColor),
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 3.dp
+        )
     ) {
         Row(modifier = Modifier
                 .fillMaxWidth()
@@ -57,20 +50,26 @@ fun SubmissionCard(submission: Submission,
 
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = submission.date,
+            Text(
+                text = submission.date,
                 color = Color.LightGray,
                 fontSize = 12.sp,
-                modifier = Modifier.weight(1f)
+
+                modifier = Modifier.weight(1.2f)
             )
-            Column(modifier = Modifier.weight(2.5f)
+            Column(
+                modifier = Modifier
+                    .weight(2.5f)
+                    .padding(horizontal = 8.dp)
             ) {
                 Text(text = submission.problemName,
                     color = Color.White,
-                    fontSize = 15.sp,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
                 )
                 Spacer(modifier = Modifier.height(5.dp))
                 Text(text = submission.language,
+
                     color = Color.Gray,
                     fontSize = 12.sp
                 )
@@ -80,62 +79,56 @@ fun SubmissionCard(submission: Submission,
                         "Accepted",
                         ignoreCase = true
                     )
-                ) {
-                    Color(0xFF00B8A3)
+                ) { acceptedColor
                 } else {
                     Color.LightGray
                 },
                 fontSize = 12.sp,
+                fontWeight = FontWeight.Medium,
                 modifier = Modifier.weight(1f)
             )
         }
     }
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SubmissionScreen(
-    username: String,
-    backtohome: () -> Unit
-) {
+fun SubmissionScreen(username: String, backtohome: () -> Unit) {
     val repository = remember {
         LeetCodeRepository()
     }
-    var submissions by remember {
+    var submissions by remember(username) {
         mutableStateOf<List<Submission>>(emptyList())
     }
-    var isLoading by remember {
+    var isLoading by remember(username) {
         mutableStateOf(true)
     }
-    var errorMessage by remember {
-        mutableStateOf("")
+    var errorMessage by remember(username) {
+        mutableStateOf<String?>(null)
     }
-    LaunchedEffect(username) {
+    var retryCount by remember(username) {
+        mutableStateOf(0)
+    }
+    LaunchedEffect(username, retryCount) {
         isLoading = true
-        errorMessage = ""
-        try {val response = repository.getSubmissions(
-                username = username,
-                limit = 20
-            )
+        errorMessage = null
+        try {val response = withTimeout(30_000L) {
+                repository.getSubmissions(
+                    username = username,
+                    limit = 20
+                )
+            }
             submissions = parseSubmissions(response)
         } catch (e: Exception) {
             errorMessage = e.message
                 ?: "Unable to load submissions"
-
-        } finally {
-
-            isLoading = false
-        }
+        } finally {isLoading = false }
     }
-    Scaffold(
-        containerColor = backgroundColor,
+    Scaffold(containerColor = backgroundColor,
         topBar = {
             TopAppBar(
                 navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            backtohome()
-                        }
-                    ) {
+                    IconButton(onClick = backtohome) {
                         Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
                             tint = Color.White
@@ -143,131 +136,141 @@ fun SubmissionScreen(
                     }
                 },
                 title = {
-                    Column { Text(text = "Submissions",
-                        color = Color.White,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
+                    Column {
+                        Text(text = "Recent Submissions",
+                            color = Color.White,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
                         )
-
-                        Text(text = username,
+                        Text(
+                            text = username,
                             color = Color.LightGray,
                             fontSize = 12.sp
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = backgroundColor,
-                    titleContentColor = Color.White
+                    containerColor = backgroundColor
                 )
             )
         }
 
     ) { innerPadding ->
-        Box(
-            modifier = Modifier
+        Box(modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
                 .background(backgroundColor)
-        ) {
-            when {isLoading -> {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(
-                            Alignment.Center
-                        ),
-                        color = Color(0xFFFFA116)
-                    )
-                }
-                errorMessage.isNotEmpty() -> {
-                    Text(text = errorMessage,
-                        color = Color.Red,
-                        fontSize = 16.sp,
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .padding(20.dp)
-                    )
-                }
-                submissions.isEmpty() -> {
 
-                    Text(text = "No submissions found",
-                        color = Color.LightGray,
-                        fontSize = 16.sp,
-                        modifier = Modifier.align(
-                            Alignment.Center
-                        )
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(
+                        Alignment.Center
+                    ),
+                    color = accentColor
+                )
+            }
+            else if (errorMessage != null) {
+                Column(modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+
+                ) {
+                    Text(text = errorMessage ?: "Something went wrong",
+                        color = Color.Red,
+                        fontSize = 14.sp
                     )
-                }
-                else -> { LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(
-                            top = 16.dp,
-                            start = 8.dp,
-                            end = 8.dp,
-                            bottom = 16.dp
-                        ),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(onClick = { retryCount++ },
+                        colors = ButtonDefaults.buttonColors(containerColor = accentColor)
                     ) {
-                        items(submissions) { submission ->
-                            SubmissionCard(
-                                submission = submission
-                            )
-                        }
+                        Text(text = "Retry",
+                            color = Color.Black
+                        )
+                    }
+                }
+            }
+            else if (submissions.isEmpty()) {
+                Text(text = "No submissions found",
+                    color = Color.LightGray,
+                    fontSize = 16.sp,
+                    modifier = Modifier.align(
+                        Alignment.Center
+                    )
+                )
+            }
+            else {
+
+                LazyColumn(modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(
+                        top = 16.dp,
+                        start = 12.dp,
+                        end = 12.dp,
+                        bottom = 16.dp
+                    ),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+
+                ) {
+                    items(items = submissions,
+                        key = { it.id }
+                    ) { submission ->
+                        SubmissionCard(
+                            submission = submission
+                        )
                     }
                 }
             }
         }
     }
 }
+
 fun parseSubmissions(
     response: JsonElement
 ): List<Submission> {
-    if (!response.isJsonArray) {
-        throw Exception("Unexpected submissions API response")
+    if (!response.isJsonObject) {
+        throw Exception(
+            "Invalid API response format"
+        )
     }
-    val jsonArray = response.asJsonArray
-    return jsonArray.mapNotNull { element ->
-
+    val jsonObject = response.asJsonObject
+    val jsonArray = jsonObject
+        .get("submission")
+        ?.takeIf { it.isJsonArray }
+        ?.asJsonArray
+        ?: throw Exception(
+            "Submission array not found in API response"
+        )
+    return jsonArray.mapIndexedNotNull { index, element ->
         if (!element.isJsonObject) {
-            return@mapNotNull null
+            return@mapIndexedNotNull null
         }
         val obj = element.asJsonObject
-        val problemName = obj.get("title")
-            ?.takeIf { !it.isJsonNull }
-            ?.asString
-            ?: obj.get("titleSlug")
-                ?.takeIf { !it.isJsonNull }
-                ?.asString
-            ?: "Unknown Problem"
-        val result = obj.get("statusDisplay")
-            ?.takeIf { !it.isJsonNull }
-            ?.asString
-            ?: "Unknown"
-        val language = obj.get("lang")
-            ?.takeIf { !it.isJsonNull }
-            ?.asString
-            ?: "Unknown"
-        val timestamp = obj.get("timestamp")
-            ?.takeIf { !it.isJsonNull }
-            ?.asString
-            ?.toLongOrNull()
+        val problemName = getJsonString(obj, "title")
+            ?: getJsonString(obj, "titleSlug") ?: "Unknown Problem"
+        val result = getJsonString(obj, "statusDisplay") ?: "Unknown"
+        val language = getJsonString(obj, "lang") ?: "Unknown"
+        val timestamp = getJsonString(obj, "timestamp")?.toLongOrNull()
         val date = timestamp?.let {
+            SimpleDateFormat(
+                "MMM dd, yyyy",
+                Locale.getDefault()
+            ).format(
+                Date(it * 1000L)
+            )
 
-            try {
-                SimpleDateFormat(
-                    "MMM dd",
-                    Locale.getDefault()
-                ).format(
-                    Date(it * 1000L)
-                )
-
-            } catch (e: Exception) {
-                "Unknown"
-            }
-        } ?: "Unknown"
-        Submission(
+        } ?: "Unknown Date"
+        val id = "$index-$timestamp-$problemName"
+        Submission(id = id,
             date = date,
             problemName = problemName,
             result = result,
             language = language
         )
     }
+}
+private fun getJsonString(obj: JsonObject, key: String): String? {
+    return obj.get(key)
+        ?.takeIf { !it.isJsonNull && it.isJsonPrimitive }
+        ?.asString
 }
